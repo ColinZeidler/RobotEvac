@@ -24,8 +24,10 @@ while True:
     screen.fill((0xaa, 0xaa, 0xaa))
     # add circle
     pygame.draw.circle(screen, (0, 0, 0), circle_center, 75, 2)
+    pygame.draw.circle(screen, (0, 0, 0), circle_center, 2, 0)
 
     bots.update()
     bots.draw(screen)
 
     pygame.display.flip()
+    pygame.time.delay(50)
