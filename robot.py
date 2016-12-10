@@ -32,7 +32,7 @@ class BotNet(object):
         while bot_count > 0:
             startpos = circle_center
             if randomize:
-                startpos = circle_center  # TODO make this random
+                startpos = (circle_center[0] + bot_count*5, circle_center[1] + bot_count*5)  # TODO make this random
             self.bots.append(Robot(bot_count, startpos, self))
             bot_count -= 1
 
