@@ -31,12 +31,13 @@ class Robot(object):
                 d = math.sqrt((self.destination[0]-self.pos[0])**2 + (self.destination[1]-self.pos[1])**2)
                 dt = self.moveSpeed
                 t = dt /d
-                x = int((1 - t)*self.pos[0] + t*self.destination[0])
-                y = int((1 - t)*self.pos[1] + t*self.destination[1])
+                x = int(round((1 - t)*self.pos[0] + t*self.destination[0]))
+                y = int(round((1 - t)*self.pos[1] + t*self.destination[1]))
                 self.pos = (x, y)
-            else:
-                print "bot {id} reached dest".format(id=self.id)
-                self.destination = None
+            if self.destination[0]-1 <= self.pos[0] <= self.destination[0]+1:
+                if self.destination[1]-1 <= self.pos[1] <= self.destination[1]+1:
+                    print "bot {id} reached dest".format(id=self.id)
+                    self.destination = None
 
 
 class BotNet(object):
