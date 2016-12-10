@@ -5,7 +5,6 @@ Initialize the UI here
 
 import sys
 import pygame
-from pygame.locals import *
 from robot import Robot, BotNet
 
 pygame.init()

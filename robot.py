@@ -15,6 +15,7 @@ class Robot(object):
         self.size = 5
         self.botNet = bot_net
         self.destination = None
+        self.dest_evac = False
         self.orbit = False
         self.orbit_CW = False
         self.c_center = circle_center
@@ -25,8 +26,9 @@ class Robot(object):
         if self.destination is not None:
             pygame.draw.circle(surface, (255, 0, 0), self.destination, 3, 0)
 
-    def set_dest(self, dest_pos):
+    def set_dest(self, dest_pos, evac=False):
         self.destination = dest_pos
+        self.dest_evac = evac
 
     def update(self):
         if self.destination is not None:
@@ -42,10 +44,16 @@ class Robot(object):
             if self.destination[0]-1 <= self.pos[0] <= self.destination[0]+1:
                 if self.destination[1]-1 <= self.pos[1] <= self.destination[1]+1:
                     print "bot {id} reached dest".format(id=self.id)
-                    self.destination = None
-                    self.orbit = True
-                    if random.randint(0, 1) == 0:
-                        self.orbit_CW = True
+                    if self.dest_evac:
+                        self.destination = None
+                        self.orbit = False
+                        self.botNet.exited(self.id)
+                    else:
+                        self.destination = None
+                        self.orbit = True
+                        if random.randint(0, 1) == 0:
+                            self.orbit_CW = True
+
         else:
             if self.orbit:
                 r_speed = self.moveSpeed/75.0
@@ -67,6 +75,7 @@ class BotNet(object):
     def __init__(self, circle_center, bot_count=1, randomize=False):
         random.seed()
         self.bots = []
+        self.evac = EvacPoint(circle_center, 75, self)
         while bot_count > 0:
             startpos = circle_center
             if randomize:
@@ -93,12 +102,39 @@ class BotNet(object):
 
     def exit_found(self, exit_pos):
         for bot in self.bots:
-            bot.set_dest(exit_pos)
+            bot.set_dest(exit_pos, evac=True)
 
     def update(self):
         for bot in self.bots:
             bot.update()
+            self.evac.update(bot.pos)
 
     def draw(self, surface):
         for bot in self.bots:
             bot.draw(surface)
+        self.evac.draw(surface)
+
+    def exited(self, botid):
+        pass
+
+
+class EvacPoint(object):
+    def __init__(self, circle_center, radius, botNet):
+        # choose random pos
+        angle = random.random() * math.pi * 2
+        x = circle_center[0] + math.cos(angle) * radius
+        y = circle_center[1] + math.sin(angle) * radius
+        self.pos = (int(round(x)), int(round(y)))
+
+        self.botNet = botNet
+        self.color = (66, 134, 244)
+        self.size = 4
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, self.color, self.pos, self.size, 0)
+        pygame.draw.circle(surface, (0, 0, 0), self.pos, self.size, 1)
+
+    def update(self, botPos):
+        if self.pos[0] - 2 <= botPos[0] <= self.pos[0] + 2:
+            if self.pos[1] - 2 <= botPos[1] <= self.pos[1] + 2:
+                self.botNet.exit_found(self.pos)
