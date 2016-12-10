@@ -4,16 +4,20 @@ import random
 
 
 class Robot(object):
-    def __init__(self, id, start_pos, bot_net):
+    def __init__(self, id, start_pos, bot_net, circle_center):
         self.id = id
         self.center = start_pos
         self.pos = start_pos
+        self.float_pos = start_pos
         self.moveSpeed = 2
         self.color = (219, 86, 19)
         self.outline = (0, 0, 0)
         self.size = 5
         self.botNet = bot_net
         self.destination = None
+        self.orbit = False
+        self.orbit_CW = False
+        self.c_center = circle_center
 
     def draw(self, surface):
         pygame.draw.circle(surface, self.color, self.pos, self.size, 0)
@@ -28,16 +32,35 @@ class Robot(object):
         if self.destination is not None:
             # move towards destination
             if self.pos != self.destination:
-                d = math.sqrt((self.destination[0]-self.pos[0])**2 + (self.destination[1]-self.pos[1])**2)
+                d = math.sqrt((self.destination[0]-self.float_pos[0])**2 + (self.destination[1]-self.float_pos[1])**2)
                 dt = self.moveSpeed
                 t = dt /d
-                x = int(round((1 - t)*self.pos[0] + t*self.destination[0]))
-                y = int(round((1 - t)*self.pos[1] + t*self.destination[1]))
-                self.pos = (x, y)
+                x = (1 - t)*self.float_pos[0] + t*self.destination[0]
+                y = (1 - t)*self.float_pos[1] + t*self.destination[1]
+                self.float_pos = (x, y)
+                self.pos = (int(round(x)), int(round(y)))
             if self.destination[0]-1 <= self.pos[0] <= self.destination[0]+1:
                 if self.destination[1]-1 <= self.pos[1] <= self.destination[1]+1:
                     print "bot {id} reached dest".format(id=self.id)
                     self.destination = None
+                    self.orbit = True
+                    if random.randint(0, 1) == 0:
+                        self.orbit_CW = True
+        else:
+            if self.orbit:
+                r_speed = self.moveSpeed/75.0
+                if not self.orbit_CW:
+                    r_speed *= -1  # make direction CCW
+                sA = math.sin(r_speed)
+                cA = math.cos(r_speed)
+                dx = (self.float_pos[0] - self.c_center[0])
+                dy = (self.float_pos[1] - self.c_center[1])
+                x = self.c_center[0] + cA * dx - sA * dy
+                y = self.c_center[1] + sA * dx + cA * dy
+
+                self.float_pos = (x, y)
+                self.pos = (int(round(x)), int(round(y)))
+            # TODO check if we reached the exit
 
 
 class BotNet(object):
@@ -62,7 +85,7 @@ class BotNet(object):
             else:
                 dest = (circle_center[0], circle_center[1] + 75)
 
-            newBot = Robot(bot_count, startpos, self)
+            newBot = Robot(bot_count, startpos, self, circle_center)
             newBot.set_dest(dest)
 
             self.bots.append(newBot)

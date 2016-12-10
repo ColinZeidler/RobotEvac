@@ -13,8 +13,8 @@ pygame.init()
 size = width, height = 320, 500
 
 screen = pygame.display.set_mode(size)
-circle_center = (width/2, 200)
-bots = BotNet(circle_center, 3, randomize=True)
+circle_center = (width/2, 100)
+bots = BotNet(circle_center, 2, randomize=True)
 
 while True:
     for event in pygame.event.get():
