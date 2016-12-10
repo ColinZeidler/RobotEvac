@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+import time
 
 
 class Robot(object):
@@ -47,7 +48,7 @@ class Robot(object):
                     if self.dest_evac:
                         self.destination = None
                         self.orbit = False
-                        self.botNet.exited(self.id)
+                        self.botNet.exited(self)
                     else:
                         self.destination = None
                         self.orbit = True
@@ -75,7 +76,12 @@ class BotNet(object):
     def __init__(self, circle_center, bot_count=1, randomize=False):
         random.seed()
         self.bots = []
+        self.bots_finished = []
         self.evac = EvacPoint(circle_center, 75, self)
+        self.startTime = time.time()
+        self.endTime = 0
+        self.done = False
+
         while bot_count > 0:
             startpos = circle_center
             if randomize:
@@ -106,16 +112,21 @@ class BotNet(object):
 
     def update(self):
         for bot in self.bots:
-            bot.update()
-            self.evac.update(bot.pos)
+            if bot not in self.bots_finished:
+                bot.update()
+                self.evac.update(bot.pos)
 
     def draw(self, surface):
         for bot in self.bots:
             bot.draw(surface)
         self.evac.draw(surface)
 
-    def exited(self, botid):
-        pass
+    def exited(self, bot):
+        self.bots_finished.append(bot)
+        if len(self.bots_finished) == len(self.bots):
+            self.endTime = time.time()
+            print "run time: {}".format(self.endTime - self.startTime)
+            self.done = True
 
 
 class EvacPoint(object):
