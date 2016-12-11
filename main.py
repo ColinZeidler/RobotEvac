@@ -13,7 +13,6 @@ size = width, height = 320, 500
 
 screen = pygame.display.set_mode(size)
 circle_center = (width/2, 100)
-bots = BotNet(circle_center, 2, randomize=True)
 
 randStart = pygame.image.load("randstart.bmp")
 randRect = randStart.get_rect()
@@ -22,6 +21,13 @@ centerRect = centerStart.get_rect()
 singleStart = pygame.image.load("onestart.bmp")
 singleRect = singleStart.get_rect()
 
+randRect.move_ip([60, 275])
+centerRect.move_ip([60, 350])
+singleRect.move_ip([60, 425])
+
+run_count = 0
+running = False
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
@@ -29,14 +35,16 @@ while True:
             d = event.__dict__
             if d['button'] == 1:
                 if randRect.left <= d['pos'][0] <= randRect.right:
-                    if randRect.bottom <= d['pos'][1] <= randRect.top:
-                        print "start all random po 50 times"
+                    if randRect.top <= d['pos'][1] <= randRect.bottom:
+                        print "start all random pos 50 times"
+                        bots = BotNet(circle_center, 2, randomize=True)
+                        running = True
                 if centerRect.left <= d['pos'][0] <= centerRect.right:
-                    if centerRect.bottom <= d['pos'][1] <= centerRect.top:
-                        print "start all random po 50 times"
+                    if centerRect.top <= d['pos'][1] <= centerRect.bottom:
+                        print "start all center 50 times"
                 if singleRect.left <= d['pos'][0] <= singleRect.right:
-                    if singleRect.bottom <= d['pos'][1] <= singleRect.top:
-                        print "start all random po 50 times"
+                    if singleRect.top <= d['pos'][1] <= singleRect.bottom:
+                        print "start one random pos 50 times"
 
     # colour background
     screen.fill((0xaa, 0xaa, 0xaa))
@@ -48,10 +56,10 @@ while True:
     screen.blit(centerStart, centerRect)
     screen.blit(singleStart, singleRect)
 
-
-
-    bots.update()
-    bots.draw(screen)
+    if running and run_count < 50:
+        bots.update()
+        bots.draw(screen)
+        run_count += 1
 
     pygame.display.flip()
     pygame.time.delay(10)
