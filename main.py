@@ -86,10 +86,10 @@ while True:
         elif run_count >= 50:
             running = False
             average = sum(times)/len(times)
-            with open("timings-{}.txt".format(mode)) as f:
+            with open("timings-{}.txt".format(mode), 'w') as f:
                 for time in times:
                     f.write("{}\n".format(time))
-                f.write("max time: {}\nmin time: {}\n average time: {}".format(max(times), min(times), average))
+                f.write("max time: {}\nmin time: {}\naverage time: {}".format(max(times), min(times), average))
             print "max time: {}\nmin time: {}".format(max(times), min(times))
             print "average time: {}".format(average)
 
