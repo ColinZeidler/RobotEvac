@@ -10,7 +10,7 @@ class Robot(object):
         self.center = start_pos
         self.pos = start_pos
         self.float_pos = start_pos
-        self.moveSpeed = 2
+        self.moveSpeed = 1
         self.color = (219, 86, 19)
         self.outline = (0, 0, 0)
         self.size = 5
