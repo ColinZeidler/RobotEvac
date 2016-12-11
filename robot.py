@@ -44,7 +44,7 @@ class Robot(object):
                 self.pos = (int(round(x)), int(round(y)))
             if self.destination[0]-1 <= self.pos[0] <= self.destination[0]+1:
                 if self.destination[1]-1 <= self.pos[1] <= self.destination[1]+1:
-                    print "bot {id} reached dest".format(id=self.id)
+
                     if self.dest_evac:
                         self.destination = None
                         self.orbit = False
@@ -69,21 +69,27 @@ class Robot(object):
 
                 self.float_pos = (x, y)
                 self.pos = (int(round(x)), int(round(y)))
-            # TODO check if we reached the exit
 
 
 class BotNet(object):
-    def __init__(self, circle_center, bot_count=1, randomize=False):
+    def __init__(self, circle_center, bot_count=1, mode="none"):
         random.seed()
         self.bots = []
         self.bots_finished = []
         self.evac = EvacPoint(circle_center, 75, self)
         self.startTime = time.time()
         self.endTime = 0
+        self.runTime = 0
         self.done = False
+
+        randomize = False
+        if mode == "both":
+            randomize = True
 
         while bot_count > 0:
             startpos = circle_center
+            if bot_count == 1 and mode == "one":
+                randomize = True
             if randomize:
                 t = 2*math.pi*random.random()
                 u = random.random() + random.random()
@@ -125,7 +131,7 @@ class BotNet(object):
         self.bots_finished.append(bot)
         if len(self.bots_finished) == len(self.bots):
             self.endTime = time.time()
-            print "run time: {}".format(self.endTime - self.startTime)
+            self.runTime = self.endTime - self.startTime
             self.done = True
 
 
