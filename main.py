@@ -31,6 +31,7 @@ singleRect.move_ip([60, 425])
 run_count = 0
 running = False
 mode = ""
+times = []
 
 while True:
     for event in pygame.event.get():
@@ -45,6 +46,7 @@ while True:
                         bots = BotNet(circle_center, 2, mode)
                         running = True
                         run_count = 0
+                        times = []
                 if centerRect.left <= d['pos'][0] <= centerRect.right:
                     if centerRect.top <= d['pos'][1] <= centerRect.bottom:
                         print "start all center 50 times"
@@ -52,6 +54,7 @@ while True:
                         bots = BotNet(circle_center, 2, mode)
                         running = True
                         run_count = 0
+                        times = []
                 if singleRect.left <= d['pos'][0] <= singleRect.right:
                     if singleRect.top <= d['pos'][1] <= singleRect.bottom:
                         print "start one random pos 50 times"
@@ -59,6 +62,7 @@ while True:
                         bots = BotNet(circle_center, 2, mode)
                         running = True
                         run_count = 0
+                        times = []
 
     # colour background
     screen.fill((0xaa, 0xaa, 0xaa))
@@ -70,16 +74,19 @@ while True:
     screen.blit(centerStart, centerRect)
     screen.blit(singleStart, singleRect)
 
-    if running and run_count < 50:
-        bots.update()
-        bots.draw(screen)
-        if bots.done:
-            print "run {}, time: {}".format(run_count, bots.runTime)
-            run_count += 1
-            bots = BotNet(circle_center, 2, mode)
-
-    if run_count >= 50:
-        running = False
+    if running:
+        if run_count < 50:
+            bots.update()
+            bots.draw(screen)
+            if bots.done:
+                print "run {}, time: {}".format(run_count, bots.runTime)
+                times.append(bots.runTime)
+                run_count += 1
+                bots = BotNet(circle_center, 2, mode)
+        elif run_count >= 50:
+            running = False
+            average = sum(times)/len(times)
+            print "average time: {}".format(average)
 
     pygame.display.flip()
     pygame.time.delay(10)
