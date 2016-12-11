@@ -20,8 +20,11 @@ class Robot(object):
         self.orbit = False
         self.orbit_CW = False
         self.c_center = circle_center
+        self.trails = []
 
     def draw(self, surface):
+        for trail in self.trails:
+            trail.draw(surface)
         pygame.draw.circle(surface, self.color, self.pos, self.size, 0)
         pygame.draw.circle(surface, self.outline, self.pos, self.size, 1)
         if self.destination is not None:
@@ -32,6 +35,7 @@ class Robot(object):
         self.dest_evac = evac
 
     def update(self):
+        self.trails.append(Trail(self.pos))
         if self.destination is not None:
             # move towards destination
             if self.pos != self.destination:
@@ -155,3 +159,13 @@ class EvacPoint(object):
         if self.pos[0] - 2 <= botPos[0] <= self.pos[0] + 2:
             if self.pos[1] - 2 <= botPos[1] <= self.pos[1] + 2:
                 self.botNet.exit_found(self.pos)
+
+
+class Trail(object):
+    def __init__(self, pos):
+        self.color = (255, 0, 0)
+        self.pos = pos
+        self.size = 1
+
+    def draw(self, surface):
+        pygame.draw.circle(surface, self.color, self.pos, self.size, 0)
