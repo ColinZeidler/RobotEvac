@@ -5,7 +5,7 @@ import time
 
 
 class Robot(object):
-    def __init__(self, id, start_pos, bot_net, circle_center):
+    def __init__(self, id, start_pos, bot_net, circle_center, orbit_cw=None):
         self.id = id
         self.center = start_pos
         self.pos = start_pos
@@ -18,7 +18,7 @@ class Robot(object):
         self.destination = None
         self.dest_evac = False
         self.orbit = False
-        self.orbit_CW = False
+        self.orbit_CW = orbit_cw
         self.c_center = circle_center
         self.trails = []
 
@@ -56,8 +56,11 @@ class Robot(object):
                     else:
                         self.destination = None
                         self.orbit = True
-                        if random.randint(0, 1) == 0:
-                            self.orbit_CW = True
+                        if self.orbit_CW is None:
+                            if random.randint(0, 1) == 0:
+                                self.orbit_CW = True
+                            else:
+                                self.orbit_CW = False
 
         else:
             if self.orbit:
@@ -109,8 +112,10 @@ class BotNet(object):
                 dest = (int(circle_center[0]+vX / magV * 75), int(circle_center[1]+vY / magV * 75))
             else:
                 dest = (circle_center[0], circle_center[1] + 75)
-
-            newBot = Robot(bot_count, startpos, self, circle_center)
+            orbit_dir = None
+            if mode == "none":
+                orbit_dir = True if bot_count == 1 else False
+            newBot = Robot(bot_count, startpos, self, circle_center, orbit_dir)
             newBot.set_dest(dest)
 
             self.bots.append(newBot)
